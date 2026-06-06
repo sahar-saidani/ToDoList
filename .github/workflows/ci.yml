@@ -7,7 +7,7 @@ on:
     branches: [main]
 
 env:
-  IMAGE_PREFIX: ghcr.io/${{ github.repository }}
+  IMAGE_PREFIX: ghcr.io/${{ github.repository_owner }}/todolist
 
 jobs:
 
