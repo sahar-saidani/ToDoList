@@ -75,22 +75,24 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Railway CLI
-        run: npm install -g @railway/cli
-
-      - name: Deploy backend to Railway
+      - name: Trigger Railway deployment via API
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-        run: railway up --service backend --detach
-        working-directory: ./backend
-
-      - name: Deploy frontend to Railway
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-        run: railway up --service frontend --detach
-        working-directory: ./frontend
+          RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
+        run: |
+          curl -X POST \
+            -H "Authorization: Bearer $RAILWAY_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "query": "mutation { deploymentCreate(input: { projectId: \"'$RAILWAY_PROJECT_ID'\" }) { id } }"
+            }' \
+            https://backboard.railway.app/graphql/v2
 
       - name: Print deploy info
+        if: always()
         run: |
+          echo "=========================================="
           echo "Deployed at: $(date '+%Y-%m-%d %H:%M:%S')"
           echo "SHA: ${{ github.sha }}"
+          echo "Railway dashboard: https://railway.app"
+          echo "=========================================="
