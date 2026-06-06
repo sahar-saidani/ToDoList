@@ -51,15 +51,14 @@ Never commit `.env`. Copy `.env.example` and fill in values.
 
 For CI/CD, add these GitHub repository secrets:
 
-- `SSH_HOST` — production server IP
-- `SSH_USER` — SSH username
-- `SSH_PRIVATE_KEY` — private key for SSH
+- `RAILWAY_TOKEN` — Railway API token (Account Settings → Tokens)
+- `RAILWAY_PROJECT_ID` — Railway project ID (Project Settings)
 
 ## CI/CD Pipeline
 
 - **lint-and-test**: ESLint + Jest on every push
 - **build-and-push**: Docker images pushed to ghcr.io (tagged by SHA + latest)
-- **deploy**: SSH deploy to production on main branch only
+- **deploy**: Railway deploy on main branch only
 
 ## Dev vs Prod
 
@@ -69,6 +68,34 @@ For CI/CD, add these GitHub repository secrets:
 | Reverse proxy  | Nginx inside frontend      | Caddy (HTTPS + routing)           |
 | Restarts       | unless-stopped             | always                            |
 | HTTPS          | No                         | Yes via Caddy + Let's Encrypt     |
+
+## Live Deployment — Railway
+
+The app is deployed on Railway (free plan).
+
+| Service  | URL |
+|----------|-----|
+| Frontend | https://todolist-frontend.up.railway.app |
+| Backend  | https://todolist-backend.up.railway.app  |
+| Health   | https://todolist-backend.up.railway.app/health |
+
+### How to deploy manually
+1. Install Railway CLI: `npm install -g @railway/cli`
+2. Login: `railway login`
+3. Link project: `railway link`
+4. Deploy: `railway up`
+
+### How CI/CD deploys
+On every push to main:
+1. lint-and-test passes
+2. Images pushed to ghcr.io
+3. Railway CLI deploys backend and frontend automatically
+
+### Railway environment variables to set in dashboard
+Set these in Railway dashboard for the backend service:
+- DATABASE_URL → provided automatically by Railway MySQL plugin
+- PORT → provided automatically by Railway
+- NODE_ENV → production
 
 ## Scripts
 

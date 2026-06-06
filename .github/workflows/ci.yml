@@ -68,26 +68,38 @@ jobs:
           cache-to: type=gha,mode=max,scope=frontend
 
   deploy:
-    name: Deploy to Production
+    name: Deploy to Railway
     runs-on: ubuntu-latest
     needs: build-and-push
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     steps:
       - uses: actions/checkout@v4
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            cd ~/todolist-devops
-            export IMAGE_TAG=${{ github.sha }}
-            export GITHUB_REPOSITORY=${{ github.repository }}
-            bash scripts/deploy.sh
-        continue-on-error: true
-      - name: Deployment note
-        if: always()
+
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
+
+      - name: Deploy backend to Railway
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
         run: |
-          echo "Add SSH_HOST, SSH_USER, SSH_PRIVATE_KEY to GitHub secrets to enable live deploy."
-          echo "Image SHA: ${{ github.sha }}"
+          railway link --project ${{ secrets.RAILWAY_PROJECT_ID }} --service backend
+          railway up --service backend --detach
+        working-directory: ./backend
+
+      - name: Deploy frontend to Railway
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: |
+          railway link --project ${{ secrets.RAILWAY_PROJECT_ID }} --service frontend
+          railway up --service frontend --detach
+        working-directory: ./frontend
+
+      - name: Print deployed URLs
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: |
+          echo "=========================================="
+          echo "Deployed at: $(date '+%Y-%m-%d %H:%M:%S')"
+          echo "SHA: ${{ github.sha }}"
+          echo "Check Railway dashboard for live URLs"
+          echo "=========================================="
