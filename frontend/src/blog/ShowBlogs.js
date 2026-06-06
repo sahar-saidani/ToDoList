@@ -2,7 +2,7 @@ import axios from 'axios'
 import { useState, useEffect } from 'react'
 import {Link} from 'react-router-dom'
 
-const URI = `${import.meta.env.VITE_API_URL}/blogs/` // variable est définie dans railway (variable)
+const URI = `${process.env.REACT_APP_API_URL || 'http://localhost:8000'}/blogs/`
 
 const CompShowBlogs = () => {
     const [blogs, setBlog] = useState([])
