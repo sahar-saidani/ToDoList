@@ -2,7 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-const URI = 'http://localhost:8000/blogs/'
+const URI = `${import.meta.env.VITE_API_URL}/blogs/` // variable est définie dans railway (variable)
 
 const CompEditBlog = () => {
     const [title, setTitle] = useState('')

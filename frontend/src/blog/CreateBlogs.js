@@ -2,7 +2,7 @@ import axios from 'axios'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-const URI = 'http://localhost:8000/blogs/'
+const URI = `${import.meta.env.VITE_API_URL}/blogs/` // variable est définie dans railway (variable)
 
 const CompCreateBlog = () => {
     const [title, setTitle] = useState('')
