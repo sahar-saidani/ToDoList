@@ -2,7 +2,7 @@ import axios from 'axios'
 import { useState, useEffect } from 'react'
 import {Link} from 'react-router-dom'
 
-const URI = `${process.env.REACT_APP_API_URL || 'http://localhost:8000'}/blogs/`
+const URI = `${process.env.production.REACT_APP_API_URL || 'http://localhost:8000'}/blogs/`
 
 const CompShowBlogs = () => {
     const [blogs, setBlog] = useState([])
