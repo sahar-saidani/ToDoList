@@ -1,3 +1,6 @@
+import { jest } from '@jest/globals';
+import request from 'supertest';
+
 jest.mock('../database/db.js', () => ({
   default: {
     authenticate: jest.fn().mockResolvedValue(true),
@@ -14,8 +17,7 @@ jest.mock('../models/BlogModel.js', () => ({
   },
 }));
 
-const request = require('supertest');
-const { app } = require('../app.js');
+const { app } = await import('../app.js');
 
 describe('GET /health', () => {
   it('returns 200 and status ok', async () => {
