@@ -1,4 +1,4 @@
-import { jest } from '@jest/globals';
+import { jest, describe, it, expect } from '@jest/globals';
 import request from 'supertest';
 
 jest.mock('../database/db.js', () => ({
@@ -17,10 +17,9 @@ jest.mock('../models/BlogModel.js', () => ({
   },
 }));
 
-const { app } = await import('../app.js');
-
 describe('GET /health', () => {
   it('returns 200 and status ok', async () => {
+    const { app } = await import('../app.js');
     const res = await request(app).get('/health');
     expect(res.status).toBe(200);
     expect(res.body.status).toBe('ok');
