@@ -1,25 +1,37 @@
 import express from "express"
 import cors from 'cors'
-// importamos la conexión a la DB
+import { fileURLToPath } from 'url'
 import db from "./database/db.js"
-// importamos nuestro enrutador
-// import blogRoutes from "./routes/routes.js"
+import BlogModel from "./models/BlogModel.js"
 import blogRoutes from "./routes/routes.js"
 
 const app = express()
+const PORT = process.env.PORT || 8000
 
-app.use( cors() )
-app.use( express.json())
+app.use(cors())
+app.use(express.json())
+
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
 app.use("/blogs", blogRoutes)
 
-db.authenticate()
-  .then(() => console.log("Database connected ✅"))
-  .catch((error) => console.log(`El error de conexión es: ${error}`))
+async function start() {
+  await db.authenticate()
+  await BlogModel.sync()
+  console.log("Database connected ✅")
+  app.listen(PORT, () => {
+    console.log(`Server UP running on port ${PORT}`)
+  })
+}
 
-// app.get('/', (req, res) => {
-//     res.send('HOLA MUNDO')
-// })
+const __filename = fileURLToPath(import.meta.url)
+const isMain = process.argv[1] === __filename
 
-app.listen(8000, () => {
-    console.log('Server UP running in http://localhost:8000/')
-})
+if (isMain) {
+  start().catch((error) => console.log(`il y a un erreur de connexion : ${error}`))
+}
+
+export { app }
+export default app

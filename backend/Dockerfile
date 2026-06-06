@@ -1,20 +1,15 @@
-FROM node:18-alpine
-
-# Dossier de travail dans le conteneur
-WORKDIR /usr/src/app
-
-# Copier uniquement les fichiers de dépendances d'abord (cache)
+FROM node:20-alpine AS builder
+WORKDIR /app
 COPY package*.json ./
+RUN npm ci --only=production
 
-# Installer les dépendances (prod uniquement)
-RUN npm install --only=production
-
-# Copier le reste du code backend
+FROM node:20-alpine
+WORKDIR /app
+COPY --from=builder /app/node_modules ./node_modules
 COPY . .
-
-
-# Exposer le port du backend
-EXPOSE 8000
-
-# Lancer l'app
-CMD ["npm", "start"]
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+USER appuser
+EXPOSE 3000
+HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
+  CMD wget -qO- http://localhost:3000/health || exit 1
+CMD ["node", "app.js"]

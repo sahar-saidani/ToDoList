@@ -2,7 +2,7 @@ import axios from 'axios'
 import { useState, useEffect } from 'react'
 import {Link} from 'react-router-dom'
 
-const URI = 'http://frontend-loadbalancer-1685083770.us-east-1.elb.amazonaws.com/blogs/'
+const URI = 'http://localhost:8000/blogs/'
 
 const CompShowBlogs = () => {
     const [blogs, setBlog] = useState([])
@@ -12,11 +12,14 @@ const CompShowBlogs = () => {
 
     //procedimiento para mostrar todos los blogs
     const getBlogs = async () => {
-        const res = await axios.get(URI)
-        // l'API renvoie un tableau de blogs, pas un objet { blogs: [...] }
-        setBlog(res.data)
+        try {
+            const res = await axios.get(URI)
+            setBlog(Array.isArray(res.data) ? res.data : [])
+        } catch (error) {
+            console.log(error)
+            setBlog([])
+        }
     }
-
     //procedimiento para eliminar un blog
     const deleteBlog = async(id) => {
         await axios.delete(`${URI}${id}`)
@@ -37,7 +40,7 @@ const CompShowBlogs = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {blogs.map (( blog) => (
+                          {Array.isArray(blogs) && blogs.map((blog) => (
                                 <tr key={blog.id}>
                                     <td>{blog.title}</td>
                                     <td>{blog.content}</td>

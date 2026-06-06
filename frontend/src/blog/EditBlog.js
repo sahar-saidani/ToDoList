@@ -2,7 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-const URI = 'http://frontend-loadbalancer-1685083770.us-east-1.elb.amazonaws.com/blogs/'
+const URI = 'http://localhost:8000/blogs/'
 
 const CompEditBlog = () => {
     const [title, setTitle] = useState('')
