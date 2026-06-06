@@ -1,19 +1,21 @@
-import { jest } from '@jest/globals';
-
-await jest.unstable_mockModule('../database/db.js', () => ({
+jest.mock('../database/db.js', () => ({
   default: {
     authenticate: jest.fn().mockResolvedValue(true),
+    define: jest.fn(),
   },
 }));
 
-await jest.unstable_mockModule('../models/BlogModel.js', () => ({
+jest.mock('../models/BlogModel.js', () => ({
   default: {
     sync: jest.fn().mockResolvedValue(true),
+    findAll: jest.fn().mockResolvedValue([]),
+    create: jest.fn().mockResolvedValue({ id: 1, title: 'test', content: 'test' }),
+    destroy: jest.fn().mockResolvedValue(1),
   },
 }));
 
-const request = (await import('supertest')).default;
-const { app } = await import('../app.js');
+const request = require('supertest');
+const { app } = require('../app.js');
 
 describe('GET /health', () => {
   it('returns 200 and status ok', async () => {
